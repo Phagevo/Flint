@@ -1,6 +1,6 @@
 import os
 from vina import Vina
-from src.chemutils import kd
+from eval.chemutils import kd
 import time
 
 def docking(
