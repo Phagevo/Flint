@@ -4,10 +4,7 @@ A computational tool designed to generate protein receptor mutants that allows e
 
 ## Outputs and expected results
 
-If executed correctly, __PJNAME__ will generate the following outputs:
-
-1. A set of unique mutated receptor proteins in PDB format, designed to maximize the binding affinity for the ligand.
-2. A summary file containing, for each receptor :
+If executed correctly, __PJNAME__ will generate a set of unique mutated receptor proteins in PDB format, designed to maximize the binding affinity for the ligand ; and a summary file containing, for each receptor :
    - The corresponding docking score, affinity constant and rank compared to other mutants.
    - Additional information about the receptor-ligand interaction (e.g. ligand position, residues involved).
    - The sequence of mutations that leads to its creation, starting from the original receptor.
