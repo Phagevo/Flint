@@ -33,7 +33,7 @@ def compute_box(
     if site_atoms.size == 0:
         site_atoms = ligand_coords
 
-    # Compute min/max coordinates for the docking box
+    # compute min/max coordinates for the docking box
     x_min, y_min, z_min = np.min(site_atoms, axis=0)
     x_max, y_max, z_max = np.max(site_atoms, axis=0)
     

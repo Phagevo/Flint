@@ -34,7 +34,7 @@ class Model:
     if self.verbose == 2:
       print('Now initializing pytorch and CUDA environment :')
 
-    # clean cache and setting the libs seeds
+    # cleans cache and sets the libs seeds
     torch.cuda.empty_cache()
     seed_all(2089)
 
@@ -42,7 +42,7 @@ class Model:
       print('\tpytorch and CUDA initialized correctly.')
       print('Now retrieving alphabet from fair-ESM :')
 
-    # set ESM2 alphabet as the usual alphabet
+    # sets ESM2 alphabet as the usual alphabet
     pretrained_model, self.alphabet = esm.pretrained.load_model_and_alphabet_hub('esm2_t33_650M_UR50D')
     del pretrained_model # ESM2 pretrained_model that we don't need here is deleted from memory
 
@@ -50,7 +50,7 @@ class Model:
       print('\tESM alphabet successfully loaded.')
       print('Now building PocketGen model :')
 
-    # set the model and load the checkpoint from .pt file
+    # sets the model and load the checkpoint from .pt file
     self.checkpoint = torch.load(checkpoint_path, map_location=self.device)
 
     if self.verbose == 2:

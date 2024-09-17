@@ -29,24 +29,24 @@ def docking(
   receptor_name = os.path.splitext(receptor_file)[-1].split('.')[0]
   ligand_name = os.path.splitext(ligand_file)[-1].split('.')[0]
 
-  #On initialise vina
+  # initialises vina
   v = Vina(sf_name='vina', verbosity=1)
   v.set_receptor(receptor_file)
   v.set_ligand_from_file(ligand_file)
 
-  #On pose la box de docking
+  # set the docking frame
   v.compute_vina_maps(center=center,box_size=box_size)
 
-  # Score the current pose
+  # scores the current pose
   energy = v.score()
   print('Score before minimization: %.3f (kcal/mol)' % energy[0])
 
-  # Minimized locally the current pose
+  # minimizes locally the current pose
   energy_minimized = v.optimize()
   print('Score after minimization : %.3f (kcal/mol)' % energy_minimized[0])
   # v.write_pose(f'{ligand_name}_minimized.pdbqt', overwrite=True)
 
-  # Dock the ligand
+  # docks the ligand
   v.dock(exhaustiveness=n_dockings, n_poses=20)
 
   if write:

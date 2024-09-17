@@ -10,8 +10,8 @@ def densify(data:dict) -> torch.Tensor:
   """
 
   return Compose([
-    FeaturizeProteinAtom(), # issue : star import
-    FeaturizeLigandAtom(), # issue : star import
+    FeaturizeProteinAtom(),
+    FeaturizeLigandAtom(),
   ])(data)
 
 
@@ -35,12 +35,12 @@ def featurize(
   @return (dict): a feature dictionnary
   """
 
-  # concatenate the first 3 dicts (prot, lig and residue)
+  # concatenates the first 3 dicts (prot, lig and residue)
   features = dict({f"p_{k}":v for k,v in protein_dict.items()}, 
     **{f"l_{k}":v for k,v in ligand_dict.items()})
   features.update(residue_dict)
 
-  # add keys for simple variables
+  # adds keys for simple variables
   features.update({
     'full_seq_index': full_seq_index,
     'r10_index': r10_index,

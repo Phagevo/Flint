@@ -11,7 +11,7 @@ def interaction(ligand_path: str, receptor_path: str) -> torch.Tensor:
   @return (torch.Tensor): a data-dense feature tensor representing the interaction.
   """
 
-  # Read and parse the mol (pdb / sdf) files
+  # read and parses the mol (pdb / sdf) files
   pdb_block = open(receptor_path, 'r').read()
   protein = PDBProtein(pdb_block)
   ligand_dict = parse_sdf_file(ligand_path, feat=False)
@@ -20,12 +20,12 @@ def interaction(ligand_path: str, receptor_path: str) -> torch.Tensor:
   r10_index, r10_residues = protein.query_residues_ligand(ligand_dict, radius=10, selected_residue=None, return_mask=False)
   full_seq_index, full_seq_residues = protein.query_residues_ligand(ligand_dict, radius=3.5, selected_residue=r10_residues, return_mask=False)
 
-  # define pocket from the (r < 10) residues
+  # defines pocket from the (r < 10) residues
   pocket = PDBProtein(protein.residues_to_pdb_block(r10_residues))
   pocket_dict = pocket.to_dict_atom()
   residue_dict = pocket.to_dict_residue()
 
-  # define the scope of protein_edit_residue (sould be of type torch.Tensor[bool])
+  # defines the scope of protein_edit_residue (sould be of type torch.Tensor[bool])
   _, residue_dict['protein_edit_residue'] = pocket.query_residues_ligand(ligand_dict)
 
   full_seq_index.sort()
@@ -45,7 +45,7 @@ def interaction(ligand_path: str, receptor_path: str) -> torch.Tensor:
     r10_index=r10_index
   )
 
-  # Add metadata
+  # add metadata
   data.update({
     'protein_filename': receptor_path,
     'ligand_filename': ligand_path
