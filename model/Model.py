@@ -22,9 +22,9 @@ class Model:
     """
 
     # setup global class variables
-    self.verbose = args.verbose
-    self.device = args.device
-    self.outputdir = args.outputdir
+    self.verbose = args["verbose"]
+    self.device = args["device"]
+    self.outputdir = args["output"]
     self.mutants = []
     self.config = load_config('./pocketgen/configs/train_model.yml')
     
