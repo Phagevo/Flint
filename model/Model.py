@@ -11,7 +11,7 @@ from functools import partial
 from .sampler import interaction
 
 class Model:
-  def __init__(self, checkpoint_path:str, verbose:int=1, device="cuda:0") -> "Model":
+  def __init__(self, checkpoint_path:str, args) -> "Model":
     """
     The mutant generation model constructor. This method does the setup of 
     torch and CUDA environment, loads the checkpoint and then returns a PocketGen 
@@ -22,12 +22,12 @@ class Model:
     """
 
     # setup global class variables
-    self.verbose = verbose
-    self.pwd = "./"
-    self.output_path = "./results"
+    self.verbose = args.verbose
+    self.device = args.device
+    self.outputdir = args.outputdir
     self.mutants = []
     self.config = load_config('./pocketgen/configs/train_model.yml')
-    self.device = device
+    
 
     if self.verbose > 0:
       print('__PJNAME__ setup started, please wait.')
