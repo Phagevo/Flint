@@ -172,4 +172,3 @@ pocketgen
 # temporary
 benchmark.py
 old_model.py
-model/*
