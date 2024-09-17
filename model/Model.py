@@ -10,9 +10,9 @@ class Model:
     The mutant generation model constructor. This method does the setup of 
     torch and CUDA environment, loads the checkpoint and then returns a PocketGen 
     instance using the weights from checkpoints and the parameters retrieved.
-    @param checkpoint_path: Path to checkpoint (.pt) file for PocketGen.
-    @param verbose: 0 for quiet, 1 for necessary information and 2 for debug.
-    @return: the instance of Model, for chainability purposes.
+    @param checkpoint_path (str): Path to checkpoint (.pt) file for PocketGen.
+    @param verbose (int): 0 for quiet, 1 for necessary information and 2 for debug.
+    @return (Model): the instance of Model, for chainability purposes.
     """
 
     # setup global class variables

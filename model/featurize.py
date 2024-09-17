@@ -5,8 +5,8 @@ import torch
 def densify(data:dict) -> torch.Tensor:
   """
   Transforms a set of human-level features to a dense data tensor.
-  @param data: a feature-dict returned by featurize()
-  @return: a dense-data torch tensor representing features.
+  @param data (dict): a feature-dict returned by featurize()
+  @return (torch.Tensor): a dense-data torch tensor representing features.
   """
 
   return Compose([
@@ -20,19 +20,19 @@ def featurize(
   ligand_dict={}, 
   residue_dict={}, 
   seq=None, 
-  full_seq_idx=None,
-  r10_idx=None) -> dict:
+  full_seq_index=None,
+  r10_index=None) -> dict:
 
   """
-  Transforms a 3-uplet of molecule dicts into a features 
+  Transforms molecule interaction data into a feature 
   dict that is interpretable by the densify function.
-  @param protein_dict: #################
-  @param ligand_dict: #################
-  @param residue_dict: #################
-  @param seq: #################
-  @param full_seq_idx: #################
-  @param r10_idx: #################
-  @return: #################
+  @param protein_dict (dict): a dictionary representation of the receptor
+  @param ligand_dict (dict): a dictionary representation of the ligand
+  @param residue_dict (dict): a dictionary representation of the residue
+  @param seq (str): #################
+  @param full_seq_index (torch.Tensor): #################
+  @param r10_index (torch.Tensor): indexes of the residues (r < 10 around ligand)
+  @return (dict): a feature dictionnary
   """
 
   # concatenate the first 3 dicts (prot, lig and residue)
@@ -42,8 +42,8 @@ def featurize(
 
   # add keys for simple variables
   features.update({
-    'full_seq_idx': full_seq_idx,
-    'r10_idx': r10_idx,
+    'full_seq_index': full_seq_index,
+    'r10_index': r10_index,
     'seq': seq
   })
 
