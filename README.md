@@ -34,10 +34,10 @@ This (above) is what should ressemble your working directory after installing __
 
 ## Usage from command line
 ```bash
-python __PJNAME__.py --receptor <receptor.pdb> --ligand <ligand.pdbqt> --output <output_directory>
+python __PJNAME__.py --receptor <receptor.pdb> --ligand <ligand.sdf> --output <output_directory>
 ```
 - `<receptor.pdb>`: Path to the input protein receptor file in PDB format.
-- `<ligand.pdbqt>`: Path to the input ligand file in SDF format.
+- `<ligand.sdf>`: Path to the input ligand file in SDF format.
 - `<output_directory>`: Directory where the output mutant structures and scores will be saved.
 
 [AutoDock Vina]: https://github.com/ccsb-scripps/AutoDock-Vina
