@@ -3,7 +3,7 @@ from .featurize import densify, featurize
 from pocketgen.utils.protein_ligand import PDBProtein, parse_sdf_file
 from pocketgen.utils.data import torchify_dict
 
-def interaction(ligand_path: str, receptor_path: str) -> torch.Tensor:
+def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
   """
   Convert PDB and SDF files into a set of protein-ligand interaction features.
   @param ligand_path (str): path to the ligand SDF file.
