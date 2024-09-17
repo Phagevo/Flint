@@ -15,7 +15,7 @@ if __name__ == "__main__":
   args = parser.parse_args()
   
   # instantiates the model with args
-  tmpname = Model("./checkpoints/esm2_t33_650M_UR50D.pt", {
+  tmpname = Model("./checkpoints/checkpoint.pt", {
     "device": args.device,
     "output": args.output,
     "verbose": args.verbose

@@ -11,14 +11,13 @@ from functools import partial
 from .sampler import interaction
 
 class Model:
-  def __init__(self, checkpoint_path:str, args) -> "Model":
+  def __init__(self, checkpoint_path:str, args):
     """
     The mutant generation model constructor. This method does the setup of 
     torch and CUDA environment, loads the checkpoint and then returns a PocketGen 
     instance using the weights from checkpoints and the parameters retrieved.
     @param checkpoint_path (str): Path to checkpoint (.pt) file for PocketGen.
     @param verbose (int): 0 for quiet, 1 for necessary information and 2 for debug.
-    @return (Model): the instance of Model, for chainability purposes.
     """
 
     # setup global class variables
@@ -74,10 +73,8 @@ class Model:
     self.model.load_state_dict(self.checkpoint['model'])
 
     if self.verbose == 2:
-      print('\tcheckpoint loaded into PocketGen.\n')
-      print('End of setup, model can now be used.\n\n\n')
-
-    return self
+      print('\tcheckpoint loaded into PocketGen.')
+      print('End of setup, model can now be used.\n\n')
   
 
   def input(self, receptor_path:str, ligand_path:str) -> "Model":
