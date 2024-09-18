@@ -42,8 +42,8 @@ def featurize(
 
   # adds keys for simple variables
   features.update({
-    'full_seq_index': full_seq_index,
-    'r10_index': r10_index,
+    'full_seq_idx': full_seq_index,
+    'r10_idx': r10_index,
     'seq': seq
   })
 

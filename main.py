@@ -1,8 +1,10 @@
 from model.Model import Model
 import argparse
+import torch
 
 # if called from command line
 if __name__ == "__main__":
+  torch.set_warn_always(False)
   parser = argparse.ArgumentParser()
 
   parser.add_argument("-d", "--device", type=str, default="cuda:0", help="Set the device (cpu or cuda:0)")
@@ -21,8 +23,10 @@ if __name__ == "__main__":
     "verbose": args.verbose
   })
   
-  # pass mol files to the model 
+  # pass molecule files to the model 
   tmpname.input(args.receptor, args.ligand)
 
-# should then compute mutants one by one => Model.generate() * n
-# should then log the results and write the summary file and PDBs => => Model.results()
+  # begin the inference / generate mutants
+  tmpname.generate()
+
+  # should then log the results and write the summary file and PDBs => => Model.results()

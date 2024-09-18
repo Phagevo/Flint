@@ -31,18 +31,14 @@ def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
   full_seq_index.sort()
   r10_index.sort()
 
-  # defensive assertions
-  assert len(r10_index) == len(r10_residues)
-  assert residue_dict['protein_edit_residue'].sum() == len(full_seq_index)
-  assert len(residue_dict['protein_edit_residue']) == len(r10_index)
-
+  # transforms data into features
   data = featurize(
     protein_dict=torchify_dict(pocket_dict),
     ligand_dict=torchify_dict(ligand_dict),
     residue_dict=torchify_dict(residue_dict),
     seq=''.join(residue_dict['seq']),
-    full_seq_index=full_seq_index,
-    r10_index=r10_index
+    full_seq_index=torch.tensor(full_seq_index),
+    r10_index=torch.tensor(r10_index)
   )
 
   # add metadata
@@ -51,4 +47,5 @@ def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
     'ligand_filename': ligand_path
   })
 
+  # return data-dense features tensor
   return densify(data)

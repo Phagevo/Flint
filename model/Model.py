@@ -27,7 +27,6 @@ class Model:
     self.mutants = []
     self.config = load_config('./pocketgen/configs/train_model.yml')
     
-
     if self.verbose > 0:
       print('__PJNAME__ setup started, please wait.')
     if self.verbose == 2:
@@ -49,12 +48,13 @@ class Model:
       print('\tESM alphabet successfully loaded.')
       print('Now building PocketGen model :')
 
-    # sets the model and load the checkpoint from .pt file
+    # get the model checkpoint from .pt file
     self.checkpoint = torch.load(checkpoint_path, map_location=self.device)
 
     if self.verbose == 2:
       print('\tcheckpoint successfully created.')
 
+    # instanciate PocketGen model for pocket design
     self.model = Pocket_Design_new(
       self.config.model,
       protein_atom_feature_dim=FeaturizeProteinAtom().feature_dim,
@@ -65,11 +65,13 @@ class Model:
     if self.verbose == 2:
       print("\tPocketGen model well instanciated.")
 
+    # send model to selected device
     self.model = self.model.to(self.device)
 
     if self.verbose == 2:
       print('\tPocketGen model sent to selected device.')
 
+    # load current saved checkpoint into model
     self.model.load_state_dict(self.checkpoint['model'])
 
     if self.verbose == 2:
@@ -96,6 +98,7 @@ class Model:
       print('\tsuccessfully parsed interaction features.\n')
       print('Now building the pytorch dataloader :')
 
+    # initialize the data loader (including batch converter)
     self.loader = DataLoader(
       [features for _ in range(8)], # 8 * features for batching reasons
       batch_size=4, 
@@ -113,7 +116,7 @@ class Model:
   
   def generate(self):
     pass
-    
+  
   
   def results(self):
     pass
