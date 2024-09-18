@@ -2,7 +2,7 @@ from pocketgen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
 from torch_geometric.transforms import Compose
 import torch
 
-def densify(data:dict) -> torch.Tensor:
+def densify(features:dict) -> torch.Tensor:
   """
   Transforms a set of human-level features to a dense data tensor.
   @param data (dict): a feature-dict returned by featurize()
@@ -12,7 +12,7 @@ def densify(data:dict) -> torch.Tensor:
   return Compose([
     FeaturizeProteinAtom(),
     FeaturizeLigandAtom(),
-  ])(data)
+  ])(features)
 
 
 def featurize(
@@ -36,8 +36,8 @@ def featurize(
   """
 
   # concatenates the first 3 dicts (prot, lig and residue)
-  features = dict({f"p_{k}":v for k,v in protein_dict.items()}, 
-    **{f"l_{k}":v for k,v in ligand_dict.items()})
+  features = dict({f"protein_{k}":v for k,v in protein_dict.items()}, 
+    **{f"ligand_{k}":v for k,v in ligand_dict.items()})
   features.update(residue_dict)
 
   # adds keys for simple variables
