@@ -44,7 +44,8 @@ def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
   # add metadata
   data.update({
     'protein_filename': receptor_path,
-    'ligand_filename': ligand_path
+    'ligand_filename': ligand_path,
+    'whole_protein_name': receptor_path + ligand_path
   })
 
   # return data-dense features tensor

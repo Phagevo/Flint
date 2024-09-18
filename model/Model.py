@@ -115,7 +115,33 @@ class Model:
 
   
   def generate(self):
-    pass
+    """
+    Generates mutants based on the input protein receptor.
+    """
+
+    if self.verbose > 0:
+      print("Now generating new mutant protein receptor :")
+
+    # place it in eval mode
+    self.model.eval()
+
+    # logits storage to understand the attention layers 
+    logits = []
+
+    # no need to compute gradients during inference
+    with torch.no_grad():
+      for batch in self.loader:
+        # move batch to selected device
+        batch = {k: v.to(self.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
+        
+        # well-predicted AA on total mask redisue
+        # root mean squared deviation (RMSD)
+        aa_ratio, rmsd, attend_logits = self.model.generate(batch, self.outputdir)
+        
+        logits.append(attend_logits.cpu())
+        
+        if self.verbose > 0:
+          print(f"\tinference done on a batch.")
   
   
   def results(self):
