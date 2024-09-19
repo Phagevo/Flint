@@ -15,7 +15,7 @@ If executed correctly, __PJNAME__ will generate a set of unique mutated receptor
 git clone https://github.com/Phagevo/__PJNAME__.git
 cd __PJNAME__
 git clone https://github.com/Phagevo/PocketGen.git
-```s
+```
 Install the environment and dependencies using [conda]'s config file
 ```bash
 conda env create -f env.yaml
