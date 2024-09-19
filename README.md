@@ -1,6 +1,6 @@
 # 🚀 __PJNAME__ : AI-powered protein receptor mutation
 
-A computational tool designed to generate protein receptor mutants that allows enhanced binding specificity towards a target ligand, based on [PocketGen]. While generating a set of mutated receptor structures, __PJNAME__ evaluates their affinity with the ligand using [AutoDock Vina]. The key point is that the docking simulation is embedded as a scoring function, making it the target of the gradient descent.
+A computational tool designed to generate protein receptor mutants that allows enhanced binding specificity towards a target ligand, based on [PocketGen]. While generating a set of mutated receptor structures, __PJNAME__ evaluates their affinity with the ligand using [AutoDock Vina]. By default, our custom `__MODELNAME__` pre-trained model checkpoint is used for the generation. The key point is that the docking simulation was embedded as the scoring function during the learning transfer, making it the target of the gradient descent (see [Model](https://2024.igem.wiki/evry-paris-saclay/model) article on the team's wiki).
 
 ## Outputs and expected results
 
@@ -12,9 +12,10 @@ If executed correctly, __PJNAME__ will generate a set of unique mutated receptor
 ## Getting started with __PJNAME__
 
 ```bash
-git clone __PJURL__
-cdn __PJNAME__
-```
+git clone https://github.com/Phagevo/__PJNAME__.git
+cd __PJNAME__
+git clone https://github.com/Phagevo/PocketGen.git
+```s
 Install the environment and dependencies using [conda]'s config file
 ```bash
 conda env create -f env.yaml
@@ -23,8 +24,9 @@ conda activate __PJNAME__
 If you intend to build environment without conda, keep in mind that installing [AutoDock Vina] from `pip` or any other package manager is deprecated. Besides, to run the project from Windows, [this question](https://stackoverflow.com/questions/71865073/unable-to-install-autodock-vina-potentially-due-to-boost) on stackoverflow might be helpful.
 ```yaml
 ├── pocketgen # can be cloned from PocketGen repository
-├── checkpoints 
-│   └── checkpoint.pt # needs to be downloaded manually
+├── checkpoints # folder needs to be created manually
+│   ├── __MODELNAME__.pt
+│   └── pocketgen.pt 
 │
 ├── eval
 ├── model
