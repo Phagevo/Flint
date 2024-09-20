@@ -1,11 +1,10 @@
 import esm
 import torch
 from torch.utils.data import DataLoader
-
-from pocketgen.models.PD import Pocket_Design_new
-from pocketgen.utils.misc import seed_all, load_config
-from pocketgen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
-from pocketgen.utils.data import collate_mols_block
+from PocketGen.models.PD import Pocket_Design_new
+from PocketGen.utils.misc import seed_all, load_config
+from PocketGen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
+from PocketGen.utils.data import collate_mols_block
 from functools import partial
 
 from .sampler import interaction
@@ -25,7 +24,7 @@ class Model:
     self.device = args["device"]
     self.outputdir = args["output"]
     self.mutants = []
-    self.config = load_config('./pocketgen/configs/train_model.yml')
+    self.config = load_config('./PocketGen/configs/train_model.yml')
     
     if self.verbose > 0:
       print('__PJNAME__ setup started, please wait.')

@@ -1,4 +1,4 @@
-from pocketgen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
+from PocketGen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
 from torch_geometric.transforms import Compose
 import torch
 
