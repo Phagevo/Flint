@@ -6,7 +6,7 @@ from PocketGen.utils.misc import seed_all, load_config
 from PocketGen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
 from PocketGen.utils.data import collate_mols_block
 from functools import partial
-
+import os 
 from .sampler import interaction
 
 class Model:
@@ -126,16 +126,17 @@ class Model:
 
     # logits storage to understand the attention layers 
     logits = []
-
+    batch_folder = os.path.join(self.outputdir, "batch")
     # no need to compute gradients during inference
     with torch.no_grad():
-      for batch in self.loader:
+      for i,batch in enumerate(self.loader):
         # move batch to selected device
         batch = {k: v.to(self.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
         
         # well-predicted AA on total mask redisue
         # root mean squared deviation (RMSD)
-        aa_ratio, rmsd, attend_logits = self.model.generate(batch, self.outputdir)
+        #batch_folder_i = os.path.join(batch_folder, str(i))
+        aa_ratio, rmsd, attend_logits = self.model.generate(batch, output_folder=self.outputdir)
         
         logits.append(attend_logits.cpu())
         

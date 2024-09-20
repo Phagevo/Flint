@@ -42,7 +42,6 @@ def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
   )
 
   # add metadata
-  print("receptor path,",receptor_path)
   data.update({
     'protein_filename': receptor_path,
     'ligand_filename': ligand_path,
