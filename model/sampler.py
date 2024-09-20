@@ -1,7 +1,7 @@
 import torch
 from .featurize import densify, featurize
-from pocketgen.utils.protein_ligand import PDBProtein, parse_sdf_file
-from pocketgen.utils.data import torchify_dict
+from PocketGen.utils.protein_ligand import PDBProtein, parse_sdf_file
+from PocketGen.utils.data import torchify_dict
 
 def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
   """
@@ -42,10 +42,11 @@ def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
   )
 
   # add metadata
+  print("receptor path,",receptor_path)
   data.update({
     'protein_filename': receptor_path,
     'ligand_filename': ligand_path,
-    'whole_protein_name': receptor_path + ligand_path
+    'whole_protein_name': receptor_path 
   })
 
   # return data-dense features tensor
