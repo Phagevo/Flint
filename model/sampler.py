@@ -36,7 +36,7 @@ def interaction(receptor_path:str, ligand_path:str) -> torch.Tensor:
     protein_dict=torchify_dict(pocket_dict),
     ligand_dict=torchify_dict(ligand_dict),
     residue_dict=torchify_dict(residue_dict),
-    seq=''.join(residue_dict['seq']),
+    seq=''.join(protein.to_dict_residue()['seq']),
     full_seq_index=torch.tensor(full_seq_index),
     r10_index=torch.tensor(r10_index)
   )
