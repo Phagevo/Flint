@@ -14,6 +14,7 @@ if __name__ == "__main__":
   parser.add_argument("--ligand", type=str, required=True, help="Set the ligand filepath")
   parser.add_argument("-n", "--number", type=str, default=8, help="Chose the number of generated mutants")
 
+
   # parse arguments
   args = parser.parse_args()
   
@@ -21,7 +22,8 @@ if __name__ == "__main__":
   flint = Model("./checkpoints/checkpoint.pt", {
     "device": args.device,
     "output": args.output,
-    "verbose": args.verbose
+    "verbose": args.verbose,
+    "number": args.number
   })
   
   # pass molecule files to the model 
