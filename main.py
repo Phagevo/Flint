@@ -12,6 +12,7 @@ if __name__ == "__main__":
   parser.add_argument("-v", "--verbose", type=int, choices=[0, 1, 2], default=1, help="Set the verbosity between 0 and 2")
   parser.add_argument("--receptor", type=str, required=True, help="Set the receptor filepath")
   parser.add_argument("--ligand", type=str, required=True, help="Set the ligand filepath")
+  parser.add_argument("-n", "--number", type=str, default=8, help="Chose the number of generated mutants")
 
   # parse arguments
   args = parser.parse_args()

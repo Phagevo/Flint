@@ -20,7 +20,7 @@ def mutations(protein1_path, protein2_path):
   Loads two protein paths and returns the number of mutations between them.
   @param protein1_path (str): the first protein path.
   @param protein2_path (str): the second protein path.
-  @return len(mutations): the number of mutations between the two proteins.
+  @return (int): the number of mutations between the two proteins.
   """
   parser = PDB.PDBParser()
   structure1 = parser.get_structure('protein1', protein1_path)
