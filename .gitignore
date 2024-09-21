@@ -162,12 +162,14 @@ cython_debug/
 .replit
 data/*
 results/*
-pocketgen/*
+PocketGen/*
 checkpoints/*
 poetry.lock
 pyproject.toml
 replit.nix
+PocketGen
 pocketgen
+pocketgen/*
 
 # temporary
 benchmark.py
