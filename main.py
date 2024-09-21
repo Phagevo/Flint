@@ -17,16 +17,17 @@ if __name__ == "__main__":
   args = parser.parse_args()
   
   # instantiates the model with args
-  tmpname = Model("./checkpoints/checkpoint.pt", {
+  flint = Model("./checkpoints/checkpoint.pt", {
     "device": args.device,
     "output": args.output,
     "verbose": args.verbose
   })
   
   # pass molecule files to the model 
-  tmpname.input(args.receptor, args.ligand)
+  flint.input(args.receptor, args.ligand)
 
   # begin the inference / generate mutants
-  tmpname.generate()
+  flint.generate()
 
-  # should then log the results and write the summary file and PDBs => => Model.results()
+  # output the results and write the summary file
+  flint.results()

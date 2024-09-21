@@ -1,13 +1,18 @@
 import esm
 import torch
+import os 
 from torch.utils.data import DataLoader
+from functools import partial
+
 from PocketGen.models.PD import Pocket_Design_new
 from PocketGen.utils.misc import seed_all, load_config
 from PocketGen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
 from PocketGen.utils.data import collate_mols_block
-from functools import partial
-import os 
+
 from .sampler import interaction
+from ..eval.docking import docking
+from ..eval.prepare import prepare
+from ..eval.window import compute_box
 
 class Model:
   def __init__(self, checkpoint_path:str, args):
@@ -27,7 +32,7 @@ class Model:
     self.config = load_config('./PocketGen/configs/train_model.yml')
     
     if self.verbose > 0:
-      print('__PJNAME__ setup started, please wait.')
+      print('Flint setup started, please wait.')
     if self.verbose == 2:
       print('Now initializing pytorch and CUDA environment :')
 
