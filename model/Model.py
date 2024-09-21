@@ -3,6 +3,7 @@ import torch
 import os 
 from torch.utils.data import DataLoader
 from functools import partial
+import numpy as np
 
 from PocketGen.models.PD import Pocket_Design_new
 from PocketGen.utils.misc import seed_all, load_config
@@ -13,6 +14,8 @@ from .sampler import interaction
 from eval.docking import docking
 from eval.prepare import prepare
 from eval.window import compute_box
+from eval.chemutils import kd
+from eval.mutations import mutations
 
 class Model:
   def __init__(self, checkpoint_path:str, args):
@@ -28,7 +31,8 @@ class Model:
     self.verbose = args["verbose"]
     self.device = args["device"]
     self.outputdir = args["output"]
-    self.mutants = []
+    self.size = args["number"]
+    self.sources = {}
     self.config = load_config('./PocketGen/configs/train_model.yml')
     
     if self.verbose > 0:
@@ -104,7 +108,7 @@ class Model:
 
     # initialize the data loader (including batch converter)
     self.loader = DataLoader(
-      [features for _ in range(8)], # 8 * features for batching reasons
+      [features for _ in range(self.size)],
       batch_size=4, 
       shuffle=False,
       num_workers=self.config.train.num_workers,
@@ -114,13 +118,19 @@ class Model:
       )
     )
 
+    # stores the source input files to compare
+    self.sources[self._nbatch()] = [receptor_path, ligand_path]
+
     if self.verbose == 2:
       print('\tpytorch dataloader built correctly.')
 
+    return self
+
   
-  def generate(self):
+  def generate(self) -> "Model":
     """
     Generates mutants based on the input protein receptor.
+    @return (Model): the instance of Model, for chainability purposes.
     """
 
     if self.verbose > 0:
@@ -129,25 +139,81 @@ class Model:
     # place it in eval mode
     self.model.eval()
 
-    # logits storage to understand the attention layers 
-    logits = []
-    batch_folder = os.path.join(self.outputdir, "batch")
     # no need to compute gradients during inference
     with torch.no_grad():
-      for i,batch in enumerate(self.loader):
+      for b, batch in enumerate(self.loader):
         # move batch to selected device
         batch = {k: v.to(self.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
         
         # well-predicted AA on total mask redisue
         # root mean squared deviation (RMSD)
-        #batch_folder_i = os.path.join(batch_folder, str(i))
-        aa_ratio, rmsd, attend_logits = self.model.generate(batch, output_folder=self.outputdir)
-        
-        logits.append(attend_logits.cpu())
-        
+        aa_ratio, rmsd, attend_logits = self.model.generate(
+          batch, output_folder=os.path.join(self.outputdir, f"batch_{b + self._nbatch()}")
+        )
+
         if self.verbose > 0:
           print(f"\tinference done on a batch.")
+
+    return self
   
   
-  def results(self):
-    pass
+  def results(self) -> "Model":
+    """
+    write results in a summary file, along with all generated PDBs.
+    @return (Model): the instance of Model, for chainability purposes.
+    """
+
+    # initialize the resulting summary TSV
+    summary = "ID\tdelta_G\tKd\tmutations (AA)\n"
+
+    if self.verbose > 0:
+      print(f"Now writing output files :")
+
+    for b in range(self._nbatch()):
+      for i in range(self.size):
+        receptor_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}.pdb")
+        ligand_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}.sdf")
+
+        # compute the docking window around ligand
+        docking_box = compute_box(receptor_path, ligand_path)
+
+        energies = docking(
+          receptor_file=prepare(receptor_path),
+          ligand_file=prepare(ligand_path),
+          center=docking_box["center"],
+          box_size=docking_box["size"]
+        )
+
+        # calculates the mean Kd and deltaG
+        mean_kd = np.mean([kd(e) for e in energies])
+        mean_dg = np.mean(energies)
+
+        # find the number of mutations (AA-level)
+        n_mutations = mutations(
+          self.sources[b][0],
+          os.path.join(self.outputdir, f"batch_{b}", f"{i}_whole.pdb")
+        )
+
+        summary += f"batch_{b}/{i}\t{mean_dg}\t{mean_kd}\t{n_mutations}" + "\n"
+
+        if self.verbose == 2:
+          print(f"\twrote one new entry in the summary file.")
+
+    if self.verbose > 0:
+      print(f"You can find the files and summary in your output folder.")
+
+    # write summary to a local file
+    with open(os.path.join(self.outputdir, "summary.tsv"), "w") as file:
+      file.write(summary)
+
+    return self
+  
+
+  def _nbatch(self) -> int:
+    """
+    returns the number of batches stored from now in the output directory
+    @return (int): the number of folders in dir
+    """
+
+    os.makedirs(self.outputdir, exist_ok=True)
+    return len(os.listdir(self.outputdir))
