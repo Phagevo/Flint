@@ -18,14 +18,15 @@ def get_energy(receptor_path, ligand_path):
   receptor_path_preped = prepare(receptor_path)
   ligand_path_preped = prepare(ligand_path)
   try:
-    energy = docking(receptor_path_preped,
+    dic = docking(receptor_path_preped,
                      ligand_path_preped,
                      center=docking_box["center"],
                      box_size=docking_box["size"],
                      n_dockings=40,
-                     n_poses=20)["Kd"]
+                     n_poses=20)
+    energy, dG =  dic["Kd"], dic["dG"]
     print("Kd:", energy)
-    return energy
+    return energy, dG
   except Exception as e:
     print(f"[!]Error: {e}.")
     print("------")
@@ -33,9 +34,9 @@ def get_energy(receptor_path, ligand_path):
 
 
 output_path = "./summary.tsv"
-res_path = "./data/PG_res/"
+res_path = "./results/mutants/"
 
-DATA = [["ID", "KD", "NUM_MUTATIONS"]]
+DATA = [["ID","SCORE" ,"KD", "NUM_MUTATIONS"]]
 
 for mol in os.listdir(res_path):
   if mol.endswith(".sdf"):
@@ -46,15 +47,15 @@ for mol in os.listdir(res_path):
       if rec.startswith(prefix) and rec.endswith(".pdb"):
         # We have a receptor that starts with the prefix of the molecule
         print("Doing:", rec, "with ligand:", mol)
-        energy = get_energy(os.path.join(res_path, rec),
+        energy,dG = get_energy(os.path.join(res_path, rec),
                             os.path.join(res_path, mol))
         
         numbers = "".join([s for s in rec.split() if s.isdigit()])
-
+        print("Numbers:", numbers)
         num_mutations = get_num_mutations(
             os.path.join(res_path, rec),
             os.path.join(res_path, numbers + "_whole.pdb"))
-        DATA.append([rec, energy, num_mutations])
+        DATA.append([rec, dG,energy, num_mutations])
         if int(numbers) >= 3:
           break
 
