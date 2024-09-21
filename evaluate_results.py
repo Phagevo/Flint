@@ -3,7 +3,7 @@ from eval.prepare import prepare
 from eval.window import compute_box
 import os
 import csv
-from eval.get_mutations import get_num_mutations
+from Software.eval.mutations import mutations
 
 
 def get_energy(receptor_path, ligand_path):
@@ -52,7 +52,7 @@ for mol in os.listdir(res_path):
         
         numbers = "".join([s for s in rec.split() if s.isdigit()])
         print("Numbers:", numbers)
-        num_mutations = get_num_mutations(
+        num_mutations = mutations(
             os.path.join(res_path, rec),
             os.path.join(res_path, numbers + "_whole.pdb"))
         DATA.append([rec, dG,energy, num_mutations])
