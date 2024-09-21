@@ -10,9 +10,9 @@ from PocketGen.utils.transforms import FeaturizeProteinAtom, FeaturizeLigandAtom
 from PocketGen.utils.data import collate_mols_block
 
 from .sampler import interaction
-from ..eval.docking import docking
-from ..eval.prepare import prepare
-from ..eval.window import compute_box
+from eval.docking import docking
+from eval.prepare import prepare
+from eval.window import compute_box
 
 class Model:
   def __init__(self, checkpoint_path:str, args):
