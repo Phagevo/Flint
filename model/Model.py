@@ -178,6 +178,9 @@ class Model:
     
     for run in range(self._nruns()):
       run_dir = os.path.join(self.outputdir, f"run_{run}")
+      
+      if os.path.isfile(os.path.join(run_dir, "summary.tsv")):
+        continue
 
       # initialize the resulting summary TSV
       summary = "ID\tdelta_G\tKd\tmutations (AA)\n"
