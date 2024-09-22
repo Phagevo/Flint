@@ -156,13 +156,17 @@ class Model:
           batch, target_path=os.path.join(run_dir, f"mutant_{b}")
         )
         
-        # stores the original input files for comparison
-        os.makedirs(os.path.join(run_dir, "original"), exist_ok=True)
-        shutil.copyfile(self.sources[0], os.path.join(run_dir, "original", "orig_receptor.pdb"))
-        shutil.copyfile(self.sources[1], os.path.join(run_dir, "original", "orig_ligand.sdf"))
-        
         if self.verbose > 0:
           print(f"\tinference done on a batch.")
+        
+    # stores the original input files for comparison
+    os.makedirs(os.path.join(run_dir, "original"), exist_ok=True)
+    shutil.copyfile(self.sources[0], os.path.join(run_dir, "original", "orig_receptor.pdb"))
+    shutil.copyfile(self.sources[1], os.path.join(run_dir, "original", "orig_ligand.sdf"))
+
+    # write inputs details to a local file
+    with open(os.path.join(run_dir, "inputs.txt"), "w") as file:
+      file.write(f"RECEPTOR: {self.sources[0]}\nLIGAND: {self.sources[1]}")
 
     return self
   
@@ -230,7 +234,8 @@ class Model:
         receptor_file=prepare(receptor_path),
         ligand_file=prepare(ligand_path),
         center=docking_box["center"],
-        box_size=docking_box["size"]
+        box_size=docking_box["size"],
+        verbosity=self.verbose
       )
     except Exception as e:
       print(f"\t\terror simulating docking: {e}")
@@ -249,6 +254,7 @@ class Model:
     os.makedirs(self.outputdir, exist_ok=True)
     return len([f for f in os.listdir(self.outputdir) if os.path.isdir(os.path.join(self.outputdir, f))])
 
+
   def _nbatches(self, run_path) -> int:
     """
     returns the number of inferences stored from now in the output directory
@@ -257,3 +263,4 @@ class Model:
 
     os.makedirs(run_path, exist_ok=True)
     return len([f for f in os.listdir(run_path) if os.path.isdir(os.path.join(run_path, f))]) - 1
+

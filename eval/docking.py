@@ -10,7 +10,8 @@ def docking(
   n_dockings:int=64, 
   n_poses:int=32,
   score=False,
-  write=False) -> "list[float] | float":
+  write=False,
+  verbosity=1) -> "list[float] | float":
 
   """
   Docking simulation function : returns ...
@@ -22,6 +23,7 @@ def docking(
   @param n_poses: number of pose attempts per simulation
   @param score (bool): wether or not the output should be a single score
   @param write (bool): wether or not the poses should be saved to a file
+  @param verbosity (int): the quantity of vina command line outputs
   @return (list[float] | float): a list of scores or a single score
   """
 
@@ -29,7 +31,7 @@ def docking(
   ligand_name = os.path.splitext(ligand_file)[-1].split('.')[0]
 
   # initialises vina
-  v = Vina(sf_name='vina', verbosity=1)
+  v = Vina(sf_name='vina', verbosity=verbosity)
   v.set_receptor(receptor_file)
   v.set_ligand_from_file(ligand_file)
 

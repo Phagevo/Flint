@@ -13,7 +13,9 @@ if __name__ == "__main__":
   parser.add_argument("--receptor", type=str, required=True, help="Set the receptor filepath")
   parser.add_argument("--ligand", type=str, required=True, help="Set the ligand filepath")
   parser.add_argument("-n", "--number", type=int, default=8, help="Chose the number of generated mutants")
-
+  parser.add_argument("--generation", action='store_true', help="Set if the model will generate new mutants")
+  parser.add_argument('--no-generation', dest='generation', action='store_false')
+  parser.set_defaults(generation=True)
 
   # parse arguments
   args = parser.parse_args()
@@ -25,12 +27,14 @@ if __name__ == "__main__":
     "verbose": args.verbose,
     "number": args.number
   })
-  
-  # pass molecule files to the model 
-  flint.input(args.receptor, args.ligand)
 
-  # begin the inference / generate mutants
-  flint.generate()
+  if args.generation:
+
+    # pass molecule files to the model 
+    flint.input(args.receptor, args.ligand)
+
+    # begin the inference / generate mutants
+    flint.generate()
 
   # output the results and write the summary file
   flint.results()
