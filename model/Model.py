@@ -16,6 +16,7 @@ from eval.docking import docking
 from eval.prepare import prepare
 from eval.window import compute_box
 from eval.mutations import mutations
+from eval.chemutils import kd
 
 class Model:
   def __init__(self, checkpoint_path:str, args):
@@ -156,6 +157,7 @@ class Model:
         )
         
         # stores the original input files for comparison
+        os.makedirs(os.path.join(run_dir, "original"), exist_ok=True)
         shutil.copyfile(self.sources[0], os.path.join(run_dir, "original", "orig_receptor.pdb"))
         shutil.copyfile(self.sources[1], os.path.join(run_dir, "original", "orig_ligand.sdf"))
         
@@ -178,21 +180,21 @@ class Model:
       run_dir = os.path.join(self.outputdir, f"run_{run}")
 
       # initialize the resulting summary TSV
-      summary = "ID\tdelta_G\tmutations (AA)\n"
+      summary = "ID\tdelta_G\tKd\tmutations (AA)\n"
 
       # write original inputs docking in summary
-      src_mean_dg = self._dock(
+      src_mean_dg, src_mean_kd = self._dock(
         os.path.join(run_dir, "original", f"orig_receptor.pdb"),
         os.path.join(run_dir, "original", "orig_ligand.sdf")
       )
 
-      summary += f"original\t{src_mean_dg}\t0" + "\n"
+      summary += f"original\t{src_mean_dg}\t{src_mean_kd}\t0" + "\n"
 
       for b in range(self._nbatches(run_dir)):
         receptor_path = os.path.join(run_dir, f"mutant_{b}", f"{b}_whole.pdb")
         ligand_path = os.path.join(run_dir, f"mutant_{b}", f"{b}.sdf")
 
-        mean_dg = self._dock(receptor_path, ligand_path)
+        mean_dg, mean_kd = self._dock(receptor_path, ligand_path)
 
         # find the number of mutations (AA-level)
         n_mutations = mutations(
@@ -200,7 +202,7 @@ class Model:
           receptor_path
         )
 
-        summary += f"mutant_{b}\t{mean_dg}\t{n_mutations}" + "\n"
+        summary += f"mutant_{b}\t{mean_dg}\t{mean_kd}\t{n_mutations}" + "\n"
 
         if self.verbose == 2:
           print(f"\twrote one new entry in the summary file.")
@@ -228,11 +230,11 @@ class Model:
         box_size=docking_box["size"]
       )
     except Exception as e:
-      print(f"\t\terror simulating docking:{e}")
+      print(f"\t\terror simulating docking: {e}")
       energies = np.zeros(1)
 
     # calculates the mean Kd and deltaG
-    return np.mean(energies)
+    return np.mean(energies), np.mean([kd(e) for e in energies])
 
 
   def _nruns(self) -> int:
@@ -251,4 +253,4 @@ class Model:
     """
 
     os.makedirs(run_path, exist_ok=True)
-    return len([f for f in os.listdir(run_path) if os.path.isdir(os.path.join(run_path, f))])
+    return len([f for f in os.listdir(run_path) if os.path.isdir(os.path.join(run_path, f))]) - 1
