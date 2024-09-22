@@ -150,7 +150,7 @@ class Model:
         # well-predicted AA on total mask redisue
         # root mean squared deviation (RMSD)
         aa_ratio, rmsd, attend_logits = self.model.generate(
-          batch, output_folder=os.path.join(self.outputdir, f"batch_{b}")
+          batch, target_path=os.path.join(self.outputdir, f"batch_{b}")
         )
         
         shutil.copyfile(self.sources[0], os.path.join(self.outputdir, f"batch_{b}", f"{b}_orig_whole.pdb")) 
@@ -166,7 +166,7 @@ class Model:
     write results in a summary file, along with all generated PDBs.
     @return (Model): the instance of Model, for chainability purposes.
     """
-
+    
     # initialize the resulting summary TSV
     summary = "ID\tdelta_G\tKd\tmutations (AA)\n"
 
@@ -175,7 +175,7 @@ class Model:
 
     for b in range(self._nbatch()):
       for i in range(self.size):
-        receptor_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}.pdb")
+        receptor_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}_whole.pdb")
         ligand_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}.sdf")
 
         # compute the docking window around ligand
@@ -224,4 +224,4 @@ class Model:
     """
 
     os.makedirs(self.outputdir, exist_ok=True)
-    return len(os.listdir(self.outputdir))
+    return len([f for f in os.listdir(self.outputdir) if os.path.isdir(os.path.join(self.outputdir, f))])

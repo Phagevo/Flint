@@ -8,7 +8,7 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
 
   parser.add_argument("-d", "--device", type=str, default="cuda:0", help="Set the device (cpu or cuda:0)")
-  parser.add_argument("-o", "--output", type=str, default="./results/mutants", help="Set the path for the output directory")
+  parser.add_argument("-o", "--output", type=str, default="./results", help="Set the path for the output directory")
   parser.add_argument("-v", "--verbose", type=int, choices=[0, 1, 2], default=1, help="Set the verbosity between 0 and 2")
   parser.add_argument("--receptor", type=str, required=True, help="Set the receptor filepath")
   parser.add_argument("--ligand", type=str, required=True, help="Set the ligand filepath")
@@ -30,7 +30,7 @@ if __name__ == "__main__":
   flint.input(args.receptor, args.ligand)
 
   # begin the inference / generate mutants
-  flint.generate()
+  #flint.generate()
 
   # output the results and write the summary file
   flint.results()
