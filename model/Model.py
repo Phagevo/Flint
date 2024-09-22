@@ -15,7 +15,6 @@ from .sampler import interaction
 from eval.docking import docking
 from eval.prepare import prepare
 from eval.window import compute_box
-from eval.chemutils import kd
 from eval.mutations import mutations
 
 class Model:
@@ -110,7 +109,7 @@ class Model:
     # initialize the data loader (including batch converter)
     self.loader = DataLoader(
       [features for _ in range(self.size)],
-      batch_size=4, 
+      batch_size=1, 
       shuffle=False,
       num_workers=self.config.train.num_workers,
       collate_fn=partial(
@@ -140,20 +139,25 @@ class Model:
     # place it in eval mode
     self.model.eval()
 
+    # creates the inference directory
+    n_runs = self._nruns()
+    run_dir = os.path.join(self.outputdir, f"run_{n_runs}")
+    os.makedirs(run_dir)
+
     # no need to compute gradients during inference
     with torch.no_grad():
       for b, batch in enumerate(self.loader):
         # move batch to selected device
         batch = {k: v.to(self.device) if isinstance(v, torch.Tensor) else v for k, v in batch.items()}
-        b += self._nbatch()
 
-        # well-predicted AA on total mask redisue
-        # root mean squared deviation (RMSD)
-        aa_ratio, rmsd, attend_logits = self.model.generate(
-          batch, target_path=os.path.join(self.outputdir, f"batch_{b}")
+        # starts the inference for a single mutant
+        self.model.generate(
+          batch, target_path=os.path.join(run_dir, f"mutant_{b}")
         )
         
-        shutil.copyfile(self.sources[0], os.path.join(self.outputdir, f"batch_{b}", f"{b}_orig_whole.pdb")) 
+        # stores the original input files for comparison
+        shutil.copyfile(self.sources[0], os.path.join(run_dir, "original", "orig_receptor.pdb"))
+        shutil.copyfile(self.sources[1], os.path.join(run_dir, "original", "orig_ligand.sdf"))
         
         if self.verbose > 0:
           print(f"\tinference done on a batch.")
@@ -170,42 +174,43 @@ class Model:
     if self.verbose > 0:
       print(f"Now writing output files :")
     
-    # initialize the resulting summary TSV
-    summary = "ID\tdelta_G\tKd\tmutations (AA)\n"
+    for run in range(self._nruns()):
+      run_dir = os.path.join(self.outputdir, f"run_{run}")
 
-    for b in range(self._nbatch()):
+      # initialize the resulting summary TSV
+      summary = "ID\tdelta_G\tmutations (AA)\n"
 
-      # source docking written in summary
-      src_mean_dg, src_mean_kd = self._dock(
-        os.path.join(self.outputdir, f"batch_{b}", f"{b}_orig_whole.pdb"),
-        os.path.join(self.outputdir, f"batch_{b}", "0.sdf")
+      # write original inputs docking in summary
+      src_mean_dg = self._dock(
+        os.path.join(run_dir, "original", f"orig_receptor.pdb"),
+        os.path.join(run_dir, "original", "orig_ligand.sdf")
       )
 
-      summary += f"batch_{b}/src\t{src_mean_dg}\t{src_mean_kd}\t0" + "\n"
+      summary += f"original\t{src_mean_dg}\t0" + "\n"
 
-      for i in range(self.size):
-        receptor_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}_whole.pdb")
-        ligand_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}.sdf")
+      for b in range(self._nbatches(run_dir)):
+        receptor_path = os.path.join(run_dir, f"mutant_{b}", f"{b}_whole.pdb")
+        ligand_path = os.path.join(run_dir, f"mutant_{b}", f"{b}.sdf")
 
-        mean_dg, mean_kd = self._dock(receptor_path, ligand_path)
+        mean_dg = self._dock(receptor_path, ligand_path)
 
         # find the number of mutations (AA-level)
         n_mutations = mutations(
-          os.path.join(self.outputdir, f"batch_{b}", f"{b}_orig_whole.pdb"),
-          os.path.join(self.outputdir, f"batch_{b}", f"{i}_whole.pdb")
+          os.path.join(run_dir, "original", f"orig_receptor.pdb"),
+          receptor_path
         )
 
-        summary += f"batch_{b}/{i}\t{mean_dg}\t{mean_kd}\t{n_mutations}" + "\n"
+        summary += f"mutant_{b}\t{mean_dg}\t{n_mutations}" + "\n"
 
         if self.verbose == 2:
           print(f"\twrote one new entry in the summary file.")
+      
+      # write summary to a local file
+      with open(os.path.join(run_dir, "summary.tsv"), "w") as file:
+        file.write(summary)
 
-    if self.verbose > 0:
-      print(f"You can find the files and summary in your output folder.")
-
-    # write summary to a local file
-    with open(os.path.join(self.outputdir, "summary.tsv"), "w") as file:
-      file.write(summary)
+      if self.verbose > 0:
+        print(f"You can find the run #{run} summary in your output folder.")
 
     return self
   
@@ -227,14 +232,23 @@ class Model:
       energies = np.zeros(1)
 
     # calculates the mean Kd and deltaG
-    return np.mean(energies), np.mean([kd(e) for e in energies])
+    return np.mean(energies)
 
 
-  def _nbatch(self) -> int:
+  def _nruns(self) -> int:
     """
-    returns the number of batches stored from now in the output directory
+    returns the number of inferences stored from now in the output directory
     @return (int): the number of folders in dir
     """
 
     os.makedirs(self.outputdir, exist_ok=True)
     return len([f for f in os.listdir(self.outputdir) if os.path.isdir(os.path.join(self.outputdir, f))])
+
+  def _nbatches(self, run_path) -> int:
+    """
+    returns the number of inferences stored from now in the output directory
+    @return (int): the number of folders in dir
+    """
+
+    os.makedirs(run_path, exist_ok=True)
+    return len([f for f in os.listdir(run_path) if os.path.isdir(os.path.join(run_path, f))])
