@@ -1,5 +1,5 @@
 import os
-from vina import vina
+from vina import Vina
 import time
 
 def docking(

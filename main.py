@@ -30,7 +30,7 @@ if __name__ == "__main__":
   flint.input(args.receptor, args.ligand)
 
   # begin the inference / generate mutants
-  # flint.generate()
+  flint.generate()
 
   # output the results and write the summary file
   flint.results()
