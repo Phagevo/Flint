@@ -166,35 +166,28 @@ class Model:
     write results in a summary file, along with all generated PDBs.
     @return (Model): the instance of Model, for chainability purposes.
     """
+
+    if self.verbose > 0:
+      print(f"Now writing output files :")
     
     # initialize the resulting summary TSV
     summary = "ID\tdelta_G\tKd\tmutations (AA)\n"
 
-    if self.verbose > 0:
-      print(f"Now writing output files :")
-
     for b in range(self._nbatch()):
+
+      # source docking written in summary
+      src_mean_dg, src_mean_kd = self._dock(
+        os.path.join(self.outputdir, f"batch_{b}", f"{b}_orig_whole.pdb"),
+        os.path.join(self.outputdir, f"batch_{b}", "0.sdf")
+      )
+
+      summary += f"batch_{b}/src\t{src_mean_dg}\t{src_mean_kd}\t0" + "\n"
+
       for i in range(self.size):
         receptor_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}_whole.pdb")
         ligand_path = os.path.join(self.outputdir, f"batch_{b}", f"{i}.sdf")
 
-        # compute the docking window around ligand
-        docking_box = compute_box(receptor_path, ligand_path)
-
-        try:
-          energies = docking(
-            receptor_file=prepare(receptor_path),
-            ligand_file=prepare(ligand_path),
-            center=docking_box["center"],
-            box_size=docking_box["size"]
-          )
-        except Exception as e:
-          print(f"\t\terror simulating docking:{e}")
-          energies = np.zeros(1)
-
-        # calculates the mean Kd and deltaG
-        mean_kd = np.mean([kd(e) for e in energies])
-        mean_dg = np.mean(energies)
+        mean_dg, mean_kd = self._dock(receptor_path, ligand_path)
 
         # find the number of mutations (AA-level)
         n_mutations = mutations(
@@ -216,6 +209,26 @@ class Model:
 
     return self
   
+
+  def _dock(self, receptor_path, ligand_path):
+
+    # compute the docking window around ligand
+    docking_box = compute_box(receptor_path, ligand_path)
+
+    try:
+      energies = docking(
+        receptor_file=prepare(receptor_path),
+        ligand_file=prepare(ligand_path),
+        center=docking_box["center"],
+        box_size=docking_box["size"]
+      )
+    except Exception as e:
+      print(f"\t\terror simulating docking:{e}")
+      energies = np.zeros(1)
+
+    # calculates the mean Kd and deltaG
+    return np.mean(energies), np.mean([kd(e) for e in energies])
+
 
   def _nbatch(self) -> int:
     """
