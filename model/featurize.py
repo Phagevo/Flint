@@ -29,9 +29,9 @@ def featurize(
   @param protein_dict (dict): a dictionary representation of the receptor
   @param ligand_dict (dict): a dictionary representation of the ligand
   @param residue_dict (dict): a dictionary representation of the residue
-  @param seq (str): #################
-  @param full_seq_index (torch.Tensor): #################
-  @param r10_index (torch.Tensor): indexes of the residues (r < 10 around ligand)
+  @param seq (str): the full amino-acide sequence
+  @param full_seq_index (torch.Tensor): edit indexes of the whole sequence
+  @param r10_index (torch.Tensor): edit indexes of the residues (r < 10 around ligand)
   @return (dict): a feature dictionnary
   """
 
