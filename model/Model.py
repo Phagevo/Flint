@@ -113,8 +113,8 @@ class Model:
       batch_size=1, 
       shuffle=False,
       num_workers=self.config.train.num_workers,
-      collate_fn=partial(
-        collate_mols_block, 
+      collate_fn=partial( # use multiprocessing to parallelize
+        collate_mols_block, # core of the batching process
         batch_converter=self.alphabet.get_batch_converter()
       )
     )
